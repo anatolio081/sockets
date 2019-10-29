@@ -37,19 +37,14 @@ def most_frequent_tag(L):
 
 class MyHTMLParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
-        # print("Start tag:", tag)
         raw_list.append(tag)
         tag_list.append(tag)
         for attr in attrs:
             if attr[0] == "href":
                 url_list.append(attr[1])
 
-    # def handle_endtag(self, tag):
-    #     print("Encountered an end tag :", tag)
-
     def handle_data(self, data):
         raw_list.append(data)
-        # print("Encountered some data  :", data)
         data_list.append(data)
 
 
@@ -64,7 +59,7 @@ server_ip = socket.gethostbyname_ex(url)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 sock = context.wrap_socket(sock, server_hostname=url)
 sock.settimeout(1)
-request = "GET / HTTP/1.1\nHost: " + url + "\n\n"
+request = "GET / HTTP/1.1\r\nHost: " + url + "\r\n\r\n"
 
 sock.connect((url, port))
 sock.send(request.encode())
@@ -77,6 +72,7 @@ while len(result) > 0:
         raw += result.decode()
     except socket.timeout:
         break
+sock.close()
 
 parser = MyHTMLParser()
 parser.feed(raw)
@@ -86,7 +82,6 @@ for tmp in img_regexp_tmp:
     img_list.append(tmp[0])
 
 for r in range(0, len(raw_list)):
-    # print(raw_list[r])
     if raw_list[r - 1] in tag_list and not (raw_list[r - 1] == "script" or raw_list[r - 1] == "style"):
         if not raw_list[r] in tag_list:
             text_list.append(raw_list[r])
